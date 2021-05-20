@@ -23,7 +23,7 @@ void secret_msg(FILE *fp2)
 	printf("\nWrite the message you want to encode: ");
 	gets(msg);
 	fputs(msg, fp2);
-	fputs("ç", fp2);
+	fputs("*", fp2);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -41,7 +41,7 @@ int size_msg(FILE *fp2)
 ///////////////////////////////////////////////////////////////////////////
 
 //copy .bmp header to output//
-void copy_header(FILE *fp1, *fp3)
+void copy_header(FILE *fp1,FILE *fp3)
 {
 	char temp;
 	rewind(fp1);
@@ -54,15 +54,29 @@ void copy_header(FILE *fp1, *fp3)
 
 ///////////////////////////////////////////////////////////////////////////
 
-//transfer msg to output//
-void transfer_msg(FILE *fp1, *fp2, *fp3)
+//get bits message//
+int msg_bits(char byte, int bit)
 {
-	char img_buff = 0, msg_buff = 0;
+	return((byte >> 8 - bit) & 1);
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////////////////////
+
+//transfer msg to output//
+void transfer_msg(FILE *fp1,FILE *fp2,FILE *fp3)// int rest, int img_size
+{
+	int i;
+	char img_buff = 0;
+	char msg_buff = 0;
 	int bit_msg;
 	
 	while((msg_buff = fgetc(fp2)) != EOF)		//while till end of msg
 	{
-		for(int i = 0, i <=8; i++)				//8 bits per char from msg
+		for(i = 1; i <= 8; i++)				//8 bits per char from msg
 		{
 			img_buff = fgetc(fp1);				//put current byte in buffer
 			
@@ -78,87 +92,83 @@ void transfer_msg(FILE *fp1, *fp2, *fp3)
 			{
 				if(check_lsb == 0)				
 				{
-					img buff = (img_buff | 1); 	//if lsb == 0 => lsb = 1		
+					img_buff = (img_buff | 1); 	//if lsb == 0 => lsb = 1		
 				}									   
 				else
 				{
-					img buff = (img_buff ^ 1); 	//if lsb == 1 => lsb = 0
+					img_buff = (img_buff ^ 1); 	//if lsb == 1 => lsb = 0
 				}
-				fputc(file_buff, fp3);
+				fputc(img_buff, fp3);
 			}
 		}
 	}
+	fclose(fp2);
 	
-	while(!feof(fp1))							//copy rest of img to output
+	
+	while(!feof(fp1))
 	{
-		char temp = fgetc(fp1);
-		fputc(temp, fp3);
+		char tmp_cpy = fgetc(fp1);
+		fputc(tmp_cpy,fp3);
+
 	}
-	printf("\nSecret message encrypted!\n);
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-//get bits message//
-void msg_bits(char msg_byte, int bit)
-{
-	int x = ((msg_byte >> 8 - bit) & 1);
-	return x;
+	
+	printf("\nSecret message encrypted!\n");
 }
 
 
+
 ///////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
 
-int encoder(char *argv_2,char *argv_3,char *argv_4)
+int encoder(char *argv_1,char *argv_2,char *argv_3)
 {
 	FILE *fp1, *fp2, *fp3;
 	
 	//open image
-	if((fp1 = fopen(argv_2, "r+")) == NULL)
+	if((fp1 = fopen(argv_1, "r+b")) == NULL)
 	{
-		printf("could not open file %s", argv_2);
+		printf("could not open file %s", argv_1);
 		return 1;
 	}
-	
+
 	//calc sizeof img
-	int size_img = size_img(fp1);
-	printf("\nMax characters storable in %s = %d \n", size_img, argv_2);
+	int img_size = size_img(fp1);
+	printf("\nMax characters storable in %s = %d \n", argv_1, img_size);
 	
 	//open .txt
-	fp2 = fopen(argv_3, "w+");
+	fp2 = fopen(argv_2, "w+");
 	
 	//write msg to .txt
 	secret_msg(fp2);
 	
 	//calc sizeof msg
-	int size_msg = size_msg(fp2);
-	printf("\nSize of secret msg = %d\n", size_img);
+	int msg_size = size_msg(fp2);
+	printf("\nSize of secret msg = %d\n", msg_size);
 	
 	//compare sizes
-	if(size_txt > size_img)
+	if(msg_size > img_size)
 	{
 		printf("\n!!Size of msg exceeds image size!! \n");
 		return 1;
 	}
 	
+	//int rest = img_size - 8*msg_size - 54;
+	
 	//create output file
-	fp3 fopen(argv_4, "w+");
+	fp3 = fopen(argv_3, "wb");
 	if(fp3 == NULL)
 	{
-		fprintf(stderr, "\n!!failed to create output file %s!!\n", argv_4);
+		fprintf(stderr, "\n!!failed to create output file %s!!\n", argv_3);
 		exit(1);
 	}
 	
 	//copy header to output
-	copy_header(fp1, fp2);
+	copy_header(fp1, fp3);
 	
 	//put msg in img
-	transfer_msg(fp1, fp2, fp3);
-	
+	transfer_msg(fp1, fp2, fp3); //rest, img_size
 	fclose(fp1);
-	fclose(fp2);
 	fclose(fp3);
 	
 	return 0;
