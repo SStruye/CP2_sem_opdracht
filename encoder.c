@@ -19,6 +19,7 @@ int size_img(FILE *fp1)
 void secret_msg(FILE *fp2)
 {
 	char msg[1000];
+	printf("\n---------------------------------------------------------\n");		
 	printf("\nWrite the message you want to encode: ");
 	gets(msg);
 	fputs(msg, fp2);
@@ -142,7 +143,7 @@ int encoder(char *argv_1,char *argv_2,char *argv_3)
 	//calc sizeof img
 	system("cls");
 	int img_size = size_img(fp1);
-	printf("\nMax characters storable in %s = %d \n", argv_1, img_size);
+	//printf("\nMax characters storable in %s = %d \n", argv_1, img_size);
 	
 	//open .txt
 	fp2 = fopen(argv_2, "w+");
@@ -153,7 +154,7 @@ int encoder(char *argv_1,char *argv_2,char *argv_3)
 	system("cls");
 	//calc sizeof msg
 	int msg_size = size_msg(fp2);
-	printf("\nSize of secret msg = %d\n", msg_size);
+	//printf("\nSize of secret msg = %d\n", msg_size);
 	
 	//compare sizes
 	if(msg_size > img_size)
