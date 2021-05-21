@@ -2,10 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include "encoder.c"
-//#include "decoder.c"
+#include "decoder.c"
 
 
-////////ENCODE//////////
+////////ENCODER//////////
 
 //calc sizeof img//
 int size_img(FILE *fp1);
@@ -24,3 +24,8 @@ void transfer_msg(FILE *fp1,FILE *fp2,FILE *fp3); //int rest, int img_size
 
 //get bits message//
 int msg_bits(char byte, int bit);
+
+////////DECODER//////////
+
+//get msg from img//
+void get_msg(FILE *fp1, FILE *fp3);
