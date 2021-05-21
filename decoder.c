@@ -1,16 +1,17 @@
 
 ///////////////////////////////////////////////////////////////////////////
 
+//extract msg//
 void get_msg(FILE *fp1, FILE *fp3)
 {
 	int buff =0;
 	int temp, bit_msg;
-	char out_temp[1000];
-	char output[1000];
+	unsigned char out_temp[1000] = {0};
+	unsigned char output[1000] = {0};
 	int x = 0;
 	int i =0;
 	
-	while(output[x] != '*')
+	while(out_temp[x] != '*')
 	{
 		i++;
 		temp = fgetc(fp1);
@@ -27,18 +28,27 @@ void get_msg(FILE *fp1, FILE *fp3)
 		if(i == 8)
 		{
 			out_temp[x] = buff;
+			
 			if(out_temp[x] == '*')
 			{
+				buff = 0;
 				break;
 			}
-			output[x] = out_temp[x];
-			putc(buff, fp3);
-			x++;
-			i = 0;
-			buff = 0;
+			else
+			{
+				putc(buff, fp3);
+				buff = 0;
+				output[x] = out_temp[x];
+				x++;
+				i = 0;
+			}
 		}
 	}
-	printf("\nThe secret message is: %s\n",output);
+	system("cls");
+	printf("\n-------------------------------------------------------------------------------------\n");
+	printf("The secret message is: %s \n",output);
+	printf("\nThe message can be found in the file named msg_out.txt!\n");
+	printf("-------------------------------------------------------------------------------------\n");
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -53,9 +63,9 @@ int decoder(char *argv_1,char *argv_3)
 	FILE *fp1, *fp3;
 	
 	//open image
-	if((fp1 = fopen(argv_1, "rb")) == NULL)
+	if((fp1 = fopen(argv_1, "r+b")) == NULL)
 	{
-		printf("could not open file %s", argv_1);
+		printf("could not open file %s! check if file is named 'output.bmp'!!", argv_1);
 		return 1;
 	}
 	
@@ -66,8 +76,8 @@ int decoder(char *argv_1,char *argv_3)
 	fp3 = fopen(argv_3, "wb");
 	if(fp3 == NULL)
 	{
-		fprintf(stderr, "\n!!failed to create output file %s!!\n", argv_3);
-		exit(1);
+		printf("\n!!failed to create output file %s!!\n", argv_3);
+		return 1;
 	}
 	
 	//get txt from file

@@ -7,7 +7,6 @@ int size_img(FILE *fp1)
 	fseek(fp1, 0x12, SEEK_SET);			//set seek to X pos
 	fread(&X, sizeof(int), 1, fp1);		//read X pos
 	fread(&Y, sizeof(int), 1, fp1);		//read Y pos
-	printf("Dimensions of image are %d x %d \n", X, Y);
 	fseek(fp1, 0L, SEEK_SET);			//set seek back to start
 	
 	return((X * Y * 3) / 8);
@@ -111,8 +110,12 @@ void transfer_msg(FILE *fp1,FILE *fp2,FILE *fp3)// int rest, int img_size
 		fputc(tmp_cpy,fp3);
 
 	}
-	
-	printf("\nSecret message encrypted!\n");
+	printf("\n-------------------------------------------------------------------------------------\n");	
+	printf("Secret message encrypted!");
+	printf("\n-------------------------------------------------------------------------------------\n");
+	printf("To decrypt message use: stegano -d -i output.bmp -o msg_out.txt ");
+	printf("\n-------------------------------------------------------------------------------------\n");
+
 }
 
 
@@ -132,11 +135,12 @@ int encoder(char *argv_1,char *argv_2,char *argv_3)
 	//open image
 	if((fp1 = fopen(argv_1, "r+b")) == NULL)
 	{
-		printf("could not open file %s", argv_1);
+		printf("could not open file  %s! Check if file is named 'input.bmp'", argv_1);
 		return 1;
 	}
 
 	//calc sizeof img
+	system("cls");
 	int img_size = size_img(fp1);
 	printf("\nMax characters storable in %s = %d \n", argv_1, img_size);
 	
@@ -146,6 +150,7 @@ int encoder(char *argv_1,char *argv_2,char *argv_3)
 	//write msg to .txt
 	secret_msg(fp2);
 	
+	system("cls");
 	//calc sizeof msg
 	int msg_size = size_msg(fp2);
 	printf("\nSize of secret msg = %d\n", msg_size);

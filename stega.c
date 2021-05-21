@@ -44,7 +44,8 @@ int main(int argc, char *argv[])
 						decoder(argv_1, argv_3);
 						break;
 					}
-		default	:	printf("\n-------------------------------------------------------------------------------------\n");
+		default	:	system("cls");
+					printf("\n-------------------------------------------------------------------------------------\n");
 					printf("|                                  !!WRONG COMMANDS!!                               |\n");
 					printf("-------------------------------------------------------------------------------------\n");
 					printf("|Too Encrypt a secret message type: stegano -c -i input.bmp -s msg.txt -o output.bmp|\n");
